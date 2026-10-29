@@ -8,4 +8,9 @@
 
 ## Funcionalidades
 
+- Configuración predeterminada de 8 parejas
+- Validación de la configuración
+- Generación de 2 cartas por pareja
+- Cada carta con valores 'numero'(entero) y 'descubierta'(booleano)
+
 ## Pruebas

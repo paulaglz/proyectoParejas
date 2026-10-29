@@ -62,3 +62,34 @@ function solicitarConfiguracion(configuracionActual) {
 const configuracion = crearConfiguracion();
 const configuracionElegida = solicitarConfiguracion(configuracion);
 console.log("Configuración elegida: ", configuracionElegida);
+
+/* R2. Generación de cartas*/
+
+function generarCartas(configuracion) {
+    if (!validarConfiguracion(configuracion)) {
+        console.error("No se pueden generar cartas: la configuración no es válida.");
+        return [];
+    }
+
+    const cartas = [];
+
+    for(let numero = 1;numero<=configuracion.parejas;numero++) {
+        const primeraCarta = {
+            numero: numero,
+            descubierta: true
+        };
+
+        const segundaCarta = {
+            numero: numero,
+            descubierta: true
+        };
+
+        cartas.push(primeraCarta);
+        cartas.push(segundaCarta);
+    }
+    return cartas;
+}
+
+/* Para comprobar que funciona correctamente
+const cartas = generarCartas(configuracionElegida)
+console.log("Cartas generadas: ", cartas)*/
