@@ -93,3 +93,18 @@ function generarCartas(configuracion) {
 /* Para comprobar que funciona correctamente
 const cartas = generarCartas(configuracionElegida)
 console.log("Cartas generadas: ", cartas)*/
+
+
+// Modifica el array original, intercambiando posiciones
+
+function barajarCartas(cartas) {
+    for (let i = cartas.length - 1; i > 0; i--) {
+        const posicionAleatoria = Math.floor(Math.random() * (i + 1));
+
+        const cartaTemporal = cartas[i];
+        cartas[i] = cartas[posicionAleatoria];
+        cartas[posicionAleatoria] = cartaTemporal;
+    }
+    return cartas;
+}
+
