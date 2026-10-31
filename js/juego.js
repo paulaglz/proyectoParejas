@@ -58,7 +58,7 @@ function solicitarConfiguracion(configuracionActual) {
 
     if (!validarConfiguracion(nuevaConfiguracion)) {
         console.log("Configuración no válida. Debes introducir un entero entre 4 y 12.");
-        return configuracionActual;
+        return null;
     }
 
     return nuevaConfiguracion;
@@ -66,8 +66,8 @@ function solicitarConfiguracion(configuracionActual) {
 
 //Configuración inicial y solicitud del número de parejas
 const configuracion = crearConfiguracion();
-const configuracionElegida = solicitarConfiguracion(configuracion);
-console.log("Configuración elegida: ", configuracionElegida);
+// const configuracionElegida = solicitarConfiguracion(configuracion);
+// console.log("Configuración elegida: ", configuracionElegida);
 
 /* R2. Generación de cartas*/
 
@@ -114,9 +114,16 @@ function barajarCartas(cartas) {
     return cartas;
 }
 
-//R4 Preparar partida
+//R4 Preparar partida para presentar
 
 function prepararPartida() {
+    const configuracionElegida = solicitarConfiguracion(configuracion);
+
+    if (!validarConfiguracion(configuracionElegida)) {
+        console.error("No se puede iniciar la partida.");
+        return [];
+    }
+
     const cartas = generarCartas(configuracionElegida);
 
     if (cartas.length === 0) {
