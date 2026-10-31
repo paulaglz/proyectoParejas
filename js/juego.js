@@ -166,6 +166,29 @@ function barajarCartas(cartas) {
     return cartas;
 }
 
+// R7 Mostrar resumen de la partida
+
+function mostrarResumen(configuracion, cartas) {
+    console.log("===== RESUMEN DE LA PARTIDA =====");
+
+    console.log("Número de parejas:", configuracion.parejas);
+
+    console.log("Número total de cartas:", cartas.length);
+
+    //Obtener secuencia de nums (map recorre array y obtiene el num de cada carta (carta => carta.numero))
+    const secuencia = cartas.map(carta => carta.numero);
+    console.log("Secuencia de cartas:", secuencia.join(", "));
+
+    console.log("Cantidad de cartas por número:");
+    for (let numero = 1; numero <= configuracion.parejas; numero++) {
+        //filter selecciona la carta del num q comprobamos y length dice cuantas hay de ese num
+        const cantidad = cartas.filter(carta => carta.numero === numero).length; 
+        console.log("Número " + numero + ": " + cantidad + " cartas");
+    }
+
+    console.log("=================================");
+}
+
 //R4 Preparar partida para presentar
 
 function prepararPartida() {
@@ -189,8 +212,7 @@ function prepararPartida() {
 
     barajarCartas(cartas);
 
-    console.log("Cartas que se mostrarán:");
-    console.table(cartas);
+    mostrarResumen(configuracion, cartas);
 
     mostrarCartas(cartas);
 
