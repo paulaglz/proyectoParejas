@@ -373,3 +373,21 @@ function ejecutarPruebas() {
     console.log("Pruebas correctas:", correctas);
     console.log("Pruebas fallidas:", fallidas);
 }
+
+/**
+ * R9 Finaliza la partida eliminando la configuración guardada
+ * en localStorage.
+ *
+ * Elimina únicamente la clave utilizada por este juego,
+ * sin borrar otros datos almacenados en el navegador.
+ *
+ * @returns {void}
+ */
+function finDePartida() {
+    try {
+        localStorage.removeItem(CLAVE_CONFIGURACION);
+        console.log("Partida finalizada. Configuración eliminada de localStorage.");
+    } catch (error) {
+        console.error("No se pudo eliminar la configuración guardada:", error);
+    }
+}
