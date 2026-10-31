@@ -8,10 +8,16 @@ function mostrarCartas(cartas) {
         return;
     }
 
+    const columnas = Math.floor(Math.sqrt(cartas.length));
+
     let contenido = "";
 
     for (let i = 0; i < cartas.length; i++) {
         contenido += cartas[i].numero + " ";
+
+        if ((i + 1) % columnas === 0) {
+            contenido += "\n";
+        }
     }
 
     tablero.textContent = contenido;
@@ -95,7 +101,7 @@ const cartas = generarCartas(configuracionElegida)
 console.log("Cartas generadas: ", cartas)*/
 
 
-// Modifica el array original, intercambiando posiciones
+// R3 Barajado. Modifica el array original, intercambiando posiciones
 
 function barajarCartas(cartas) {
     for (let i = cartas.length - 1; i > 0; i--) {
@@ -108,3 +114,24 @@ function barajarCartas(cartas) {
     return cartas;
 }
 
+//R4 Preparar partida
+
+function prepararPartida() {
+    const cartas = generarCartas(configuracionElegida);
+
+    if (cartas.length === 0) {
+        console.error("No se puede preparar la partida.");
+        return [];
+    }
+
+    barajarCartas(cartas);
+
+    console.log("Cartas que se mostrarán:");
+    console.table(cartas);
+
+    mostrarCartas(cartas);
+
+    return cartas;
+}
+// Iniciamos la partida.
+prepararPartida();
