@@ -1,4 +1,7 @@
 "use strict";
+const CLAVE_CONFIGURACION = "dew_juego_parejas_config";
+let configuracion = recuperarConfiguracion();
+
 /* Función mostrarCartas */
 function mostrarCartas(cartas) {
     const tablero = document.getElementById("tablero");
@@ -65,9 +68,58 @@ function solicitarConfiguracion(configuracionActual) {
 }
 
 //Configuración inicial y solicitud del número de parejas
-const configuracion = crearConfiguracion();
+//const configuracion = crearConfiguracion();
 // const configuracionElegida = solicitarConfiguracion(configuracion);
 // console.log("Configuración elegida: ", configuracionElegida);
+
+// R5 Guardar la configuración en localstorage
+function guardarConfiguracion(configuracion) {
+    if (!validarConfiguracion(configuracion)) {
+        console.error("No se puede guardar una configuración no válida.");
+        return;
+    }
+
+    try {
+        const datosJSON = JSON.stringify(configuracion); //convierte configuracion en texto json
+
+        localStorage.setItem(CLAVE_CONFIGURACION, datosJSON); //lo guarda en localstorage con setItem
+
+    } catch (error) {
+        console.error("Error al guardar la configuración:", error);
+    }
+}
+
+//Recuperar la configuración
+function recuperarConfiguracion() {
+    try {
+        const datosGuardados = localStorage.getItem(CLAVE_CONFIGURACION);
+
+        if (datosGuardados === null) {
+            return crearConfiguracion();
+        }
+
+        const configuracionGuardada = JSON.parse(datosGuardados); //para convertirlos de json a js
+
+        if (validarConfiguracion(configuracionGuardada)) {
+            return configuracionGuardada;
+        }
+
+        console.error("La configuración guardada no es válida.");
+
+    } catch (error) {
+        console.error("Error al recuperar la configuración:", error);
+    }
+
+    return crearConfiguracion();
+}
+
+// Restablecer la conguracion a la predeterminada
+function restablecerConfiguracion() {
+    configuracion = crearConfiguracion();
+    guardarConfiguracion(configuracion);
+
+    console.log("Configuración restablecida:", configuracion);
+}
 
 /* R2. Generación de cartas*/
 
@@ -123,6 +175,10 @@ function prepararPartida() {
         console.error("No se puede iniciar la partida.");
         return [];
     }
+
+    configuracion = configuracionElegida;
+
+    guardarConfiguracion(configuracion);
 
     const cartas = generarCartas(configuracionElegida);
 

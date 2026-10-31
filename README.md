@@ -13,6 +13,8 @@
 - Generación de 2 cartas por pareja
 - Cada carta con valores 'numero'(entero) y 'descubierta'(booleano)
 - Barajado Fisher-Yates con Math.random()
-- 
+- Persistencia de preferencias con localstorage, JSON.stringtify() y JSON.parse()
+- Recuperación de la configuración
+- Restablecimiento a los valores iniciales
 
 ## Pruebas
