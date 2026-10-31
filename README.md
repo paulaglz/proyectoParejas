@@ -16,5 +16,8 @@
 - Persistencia de preferencias con localstorage, JSON.stringtify() y JSON.parse()
 - Recuperación de la configuración
 - Restablecimiento a los valores iniciales
+- Resumen de la partida en consola
+- Pruebas de validación, generación y conservación de cartas.
+-
 
 ## Pruebas
