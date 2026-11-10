@@ -22,17 +22,16 @@ function mostrarCartas(cartas) {
 
     tablero.innerHTML = "";
 
-    // Calcular el número de columnas
     const columnas = Math.floor(Math.sqrt(cartas.length));
-
-    // Establecer las columnas del tablero
     tablero.style.gridTemplateColumns = `repeat(${columnas}, 100px)`;
 
     for (let i = 0; i < cartas.length; i++) {
         const carta = document.createElement("div");
 
         carta.className = "carta";
-        carta.textContent = cartas[i].numero;
+        carta.dataset.numero = cartas[i].numero;
+        carta.dataset.girada = "false";
+        carta.textContent = "x";
 
         tablero.appendChild(carta);
     }
@@ -294,6 +293,34 @@ function barajarCartas(cartas) {
     }
     return cartas;
 }
+
+/**
+ * Da la vuelta a una carta del tablero.
+ * Si está oculta, muestra su número; si está descubierta, la vuelve a ocultar.
+ *
+ * @param {number} posicion - Posición de la carta en el tablero (empezando por 0).
+ * @returns {void}
+ */
+function darVueltaCarta(posicion) {
+    const tablero = document.getElementById("tablero");
+
+    if (!tablero || !tablero.children[posicion]) {
+        console.error("No existe una carta en esa posición.");
+        return;
+    }
+
+    const carta = tablero.children[posicion];
+
+    if (carta.dataset.girada === "true") {
+        carta.textContent = "x";
+        carta.dataset.girada = "false";
+    } else {
+        carta.textContent = carta.dataset.numero;
+        carta.dataset.girada = "true";
+    }
+}
+
+
 
 
 /**
