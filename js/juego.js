@@ -1,5 +1,7 @@
+
 "use strict";
 const CLAVE_CONFIGURACION = "dew_juego_parejas_config";
+const CLAVE_PARTIDA = "dew_juego_parejas_partida";
 let configuracion = recuperarConfiguracion();
 
 /* Función mostrarCartas */
@@ -150,6 +152,74 @@ function recuperarConfiguracion() {
 
 
 /**
+ * R6 Guardar la partida en localStorage.
+ * Guarda la configuración y las cartas en el orden en el que están.
+ *
+ * @param {{parejas: number}} configuracion Configuración de la partida.
+ * @param {Array<{numero: number, descubierta: boolean}>} cartas Cartas de la partida.
+ * @returns {void}
+ */
+function guardarPartida(configuracion, cartas) {
+    try {
+        const partida = {
+            configuracion: configuracion,
+            cartas: cartas
+        };
+
+        const datosJSON = JSON.stringify(partida);
+        localStorage.setItem(CLAVE_PARTIDA, datosJSON);
+
+    } catch (error) {
+        console.error("Error al guardar la partida:", error);
+    }
+}
+
+/**
+ * Recupera la partida guardada en localStorage.
+ * Comprueba que la configuración y las cartas sean válidas.
+ *
+ * @returns {{configuracion: {parejas: number}, cartas: Array<{numero: number, descubierta: boolean}>} | null}
+ *          Partida recuperada o null si no existe o no es válida.
+ */
+function recuperarPartida() {
+    try {
+        const datosGuardados = localStorage.getItem(CLAVE_PARTIDA);
+
+        if (datosGuardados === null) {
+            return null;
+        }
+
+        const partidaGuardada = JSON.parse(datosGuardados);
+
+        if (!partidaGuardada || !validarConfiguracion(partidaGuardada.configuracion)) {
+            console.error("La partida guardada no es válida.");
+            return null;
+        }
+
+        if (!Array.isArray(partidaGuardada.cartas)
+            || partidaGuardada.cartas.length !== partidaGuardada.configuracion.parejas * 2
+            || !partidaGuardada.cartas.every(carta =>
+                carta !== null
+                && typeof carta === "object"
+                && Number.isInteger(carta.numero)
+                && carta.numero >= 1
+                && carta.numero <= partidaGuardada.configuracion.parejas
+                && typeof carta.descubierta === "boolean"
+            )) {
+            console.error("Las cartas de la partida guardada no son válidas.");
+            return null;
+        }
+
+        return partidaGuardada;
+
+    } catch (error) {
+        console.error("Error al recuperar la partida:", error);
+        return null;
+    }
+}
+
+
+/**
  * Restablece la configuración de la partida a sus valores iniciales.
  * Guarda la configuración predeterminada en localStorage.
  *
@@ -261,6 +331,21 @@ function mostrarResumen(configuracion, cartas) {
  *          Array de cartas barajadas o vacío si no se puede iniciar la partida.
  */
 function prepararPartida() {
+    // Comprobar si existe una partida guardada.
+    const partidaGuardada = recuperarPartida();
+
+    if (partidaGuardada !== null) {
+        configuracion = partidaGuardada.configuracion;
+        const cartas = partidaGuardada.cartas;
+
+        console.log("Se ha recuperado la partida guardada.");
+        mostrarResumen(configuracion, cartas);
+        mostrarCartas(cartas);
+
+        return cartas;
+    }
+
+    // Si no existe una partida guardada, se prepara una nueva.
     const configuracionElegida = solicitarConfiguracion(configuracion);
 
     if (!validarConfiguracion(configuracionElegida)) {
@@ -280,6 +365,9 @@ function prepararPartida() {
     }
 
     barajarCartas(cartas);
+
+    // Guardar las cartas después de barajarlas para conservar sus posiciones.
+    guardarPartida(configuracion, cartas);
 
     mostrarResumen(configuracion, cartas);
 
@@ -306,7 +394,7 @@ function ejecutarPruebas() {
     /**
      * Comprueba una condición y muestra el resultado.
      *
-     * @param {boolean} condicion Resultado que se quiere comprobar.
+     * @param {boolean} condicion Resultado de la prueba.
      * @param {string} descripcion Descripción de la prueba.
      * @returns {void}
      */
@@ -324,7 +412,7 @@ function ejecutarPruebas() {
     /**
      * Comprueba una condición y muestra el resultado de la prueba.
      *
-     * @param {boolean} condicion Resultado que se quiere comprobar.
+     * @param {boolean} condicion Resultado de la prueba.
      * @param {string} descripcion Descripción de la prueba.
      * @returns {void}
      */
@@ -383,8 +471,9 @@ function ejecutarPruebas() {
 function finDePartida() {
     try {
         localStorage.removeItem(CLAVE_CONFIGURACION);
-        console.log("Partida finalizada. Configuración eliminada de localStorage.");
+        localStorage.removeItem(CLAVE_PARTIDA);
+        console.log("Partida finalizada. Datos de la partida eliminados de localStorage.");
     } catch (error) {
-        console.error("No se pudo eliminar la configuración guardada:", error);
+        console.error("No se pudo eliminar la partida guardada:", error);
     }
 }
