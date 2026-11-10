@@ -19,19 +19,16 @@ function mostrarCartas(cartas) {
         return;
     }
 
-    const columnas = Math.floor(Math.sqrt(cartas.length));
-
-    let contenido = "";
+    tablero.innerHTML = "";
 
     for (let i = 0; i < cartas.length; i++) {
-        contenido += cartas[i].numero + " ";
+        const carta = document.createElement("div");
 
-        if ((i + 1) % columnas === 0) {
-            contenido += "\n";
-        }
+        carta.className = "carta";
+        carta.textContent = cartas[i].numero;
+
+        tablero.appendChild(carta);
     }
-
-    tablero.textContent = contenido;
 }
 
 

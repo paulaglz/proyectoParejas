@@ -1,0 +1,31 @@
+
+#tablero {
+    white-space: pre-wrap;
+    display: grid;
+    grid-template-columns: repeat(4, 60px);
+    gap: 50px;
+    justify-content: center;
+    margin-top: 30px;
+
+}
+
+.carta {
+
+    /*Forma carta*/
+    width: 90px;
+    height: 120px;
+    background-color: lightpink;
+    border: 2px solid darkmagenta;
+    border-radius: 12px;
+
+
+    /*Numero en el centro*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /*Numero*/
+    font-size: 35px;
+    font-weight: bold;
+    color: darkmagenta;
+}
