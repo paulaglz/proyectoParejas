@@ -1,3 +1,10 @@
+h1 {
+  text-align: center;
+  margin-left: 35px;
+  color: darkmagenta;
+
+}
+
 
 #tablero {
     white-space: pre-wrap;
