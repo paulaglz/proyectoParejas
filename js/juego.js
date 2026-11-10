@@ -1,4 +1,3 @@
-
 "use strict";
 const CLAVE_CONFIGURACION = "dew_juego_parejas_config";
 const CLAVE_PARTIDA = "dew_juego_parejas_partida";
@@ -22,6 +21,12 @@ function mostrarCartas(cartas) {
     }
 
     tablero.innerHTML = "";
+
+    // Calcular el número de columnas
+    const columnas = Math.floor(Math.sqrt(cartas.length));
+
+    // Establecer las columnas del tablero
+    tablero.style.gridTemplateColumns = `repeat(${columnas}, 100px)`;
 
     for (let i = 0; i < cartas.length; i++) {
         const carta = document.createElement("div");

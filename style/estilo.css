@@ -1,19 +1,15 @@
-h1 {
-  text-align: center;
-  margin-left: 35px;
-  color: darkmagenta;
-
+body {
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
-
+h1 {
+  text-align: center;
+    color: rgb(179, 54, 112);
+}
 #tablero {
-    white-space: pre-wrap;
     display: grid;
-    grid-template-columns: repeat(4, 60px);
-    gap: 50px;
+    gap: 10px;
     justify-content: center;
-    margin-top: 30px;
-
 }
 
 .carta {
@@ -22,8 +18,9 @@ h1 {
     width: 90px;
     height: 120px;
     background-color: lightpink;
-    border: 2px solid darkmagenta;
+    border: 2px solid rgb(179, 54, 112);
     border-radius: 12px;
+    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
 
 
     /*Numero en el centro*/
@@ -34,5 +31,5 @@ h1 {
     /*Numero*/
     font-size: 35px;
     font-weight: bold;
-    color: darkmagenta;
+    color: rgb(179, 54, 112);
 }
