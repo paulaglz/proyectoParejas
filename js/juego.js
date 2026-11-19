@@ -1,7 +1,10 @@
+import { Carta } from "./carta.js";
+
 "use strict";
 const CLAVE_CONFIGURACION = "dew_juego_parejas_config";
 const CLAVE_PARTIDA = "dew_juego_parejas_partida";
 let configuracion = recuperarConfiguracion();
+let cartasPartida = [];
 
 /* Función mostrarCartas */
 /**
@@ -26,14 +29,17 @@ function mostrarCartas(cartas) {
     tablero.style.gridTemplateColumns = `repeat(${columnas}, 100px)`;
 
     for (let i = 0; i < cartas.length; i++) {
-        const carta = document.createElement("div");
+        const elementoCarta = document.createElement("div");
 
-        carta.className = "carta";
-        carta.dataset.numero = cartas[i].numero;
-        carta.dataset.girada = "false";
-        carta.textContent = "x";
+        elementoCarta.className = "carta";
 
-        tablero.appendChild(carta);
+        if (cartas[i].descubierta) {
+            elementoCarta.textContent = cartas[i].numero;
+        } else {
+            elementoCarta.textContent = "x";
+        }
+
+        tablero.appendChild(elementoCarta);
     }
 }
 
@@ -167,7 +173,10 @@ function guardarPartida(configuracion, cartas) {
     try {
         const partida = {
             configuracion: configuracion,
-            cartas: cartas
+            cartas: cartas.map(carta => ({
+                numero: carta.numero,
+                descubierta: carta.descubierta
+            }))
         };
 
         const datosJSON = JSON.stringify(partida);
@@ -240,7 +249,7 @@ function restablecerConfiguracion() {
  * R2. Generación de cartas
  * Genera dos cartas por cada pareja de la configuración.
  * Cada carta contiene un número y una propiedad booleana que indica si está descubierta.
- * Todas las cartas se generan descubiertas.
+ * Todas las cartas se generan cubiertas.
  *
  * @param {{parejas: number}} configuracion Configuración de la partida.
  * @returns {Array<{numero: number, descubierta: boolean}>}
@@ -254,16 +263,9 @@ function generarCartas(configuracion) {
 
     const cartas = [];
 
-    for(let numero = 1;numero<=configuracion.parejas;numero++) {
-        const primeraCarta = {
-            numero: numero,
-            descubierta: true
-        };
-
-        const segundaCarta = {
-            numero: numero,
-            descubierta: true
-        };
+    for (let numero = 1; numero <= configuracion.parejas; numero++) {
+        const primeraCarta = new Carta(numero);
+        const segundaCarta = new Carta(numero);
 
         cartas.push(primeraCarta);
         cartas.push(segundaCarta);
@@ -295,29 +297,37 @@ function barajarCartas(cartas) {
 }
 
 /**
- * Da la vuelta a una carta del tablero.
+ * Da la vuelta a una carta del tablero según su posición (x, y).
  * Si está oculta, muestra su número; si está descubierta, la vuelve a ocultar.
  *
- * @param {number} posicion - Posición de la carta en el tablero (empezando por 0).
+ * @param {number} x Columna de la carta (Empezando por 0)
+ * @param {number} y Fila de la carta (Empezando por 0)
  * @returns {void}
  */
-function darVueltaCarta(posicion) {
-    const tablero = document.getElementById("tablero");
+function darVueltaCarta(x, y) {
+    const columnas = Math.floor(Math.sqrt(cartasPartida.length));
 
-    if (!tablero || !tablero.children[posicion]) {
+    if (!Number.isInteger(x) || !Number.isInteger(y)
+        || x < 0 || y < 0 || x >= columnas) {
+        console.error("La posición indicada no es válida.");
+        return;
+    }
+
+    const posicion = y * columnas + x;
+
+    if (!cartasPartida[posicion]) {
         console.error("No existe una carta en esa posición.");
         return;
     }
 
-    const carta = tablero.children[posicion];
+    // Voltear la carta utilizando su método.
+    cartasPartida[posicion].voltear();
 
-    if (carta.dataset.girada === "true") {
-        carta.textContent = "x";
-        carta.dataset.girada = "false";
-    } else {
-        carta.textContent = carta.dataset.numero;
-        carta.dataset.girada = "true";
-    }
+    // Actualizar el tablero.
+    mostrarCartas(cartasPartida);
+
+    // Guardar el estado actual de la partida.
+    guardarPartida(configuracion, cartasPartida);
 }
 
 
@@ -368,13 +378,12 @@ function prepararPartida() {
 
     if (partidaGuardada !== null) {
         configuracion = partidaGuardada.configuracion;
-        const cartas = partidaGuardada.cartas;
-
+        cartasPartida = partidaGuardada.cartas.map( carta => new Carta(carta.numero, carta.descubierta));
         console.log("Se ha recuperado la partida guardada.");
-        mostrarResumen(configuracion, cartas);
-        mostrarCartas(cartas);
+        mostrarResumen(configuracion, cartasPartida);
+        mostrarCartas(cartasPartida);
 
-        return cartas;
+        return cartasPartida;
     }
 
     // Si no existe una partida guardada, se prepara una nueva.
@@ -389,26 +398,28 @@ function prepararPartida() {
 
     guardarConfiguracion(configuracion);
 
-    const cartas = generarCartas(configuracionElegida);
+    cartasPartida = generarCartas(configuracionElegida);
 
-    if (cartas.length === 0) {
+    if (cartasPartida.length === 0) {
         console.error("No se puede preparar la partida.");
         return [];
     }
 
-    barajarCartas(cartas);
+    barajarCartas(cartasPartida);
 
     // Guardar las cartas después de barajarlas para conservar sus posiciones.
-    guardarPartida(configuracion, cartas);
+    guardarPartida(configuracion, cartasPartida);
 
-    mostrarResumen(configuracion, cartas);
+    mostrarResumen(configuracion, cartasPartida);
 
-    mostrarCartas(cartas);
+    mostrarCartas(cartasPartida);
 
-    return cartas;
+    return cartasPartida;
 }
 // Iniciamos la partida.
 prepararPartida();
+window.darVueltaCarta = darVueltaCarta;
+window.finDePartida = finDePartida;
 
 /**
  * Ejecuta pruebas para comprobar el funcionamiento del juego.
@@ -461,8 +472,7 @@ function ejecutarPruebas() {
     comprobar(cartas.length === 8, "Genera dos cartas por cada pareja.");
     comprobar(cartas.every(carta => typeof carta.numero === "number"), 
         "Los números de las cartas son de tipo number.");
-    comprobar(cartas.every(carta => carta.descubierta === true), "Todas las cartas están descubiertas.");
-
+    comprobar(cartas.every(carta => carta.descubierta === false), "Todas las cartas están ocultas.");
     let parejasCorrectas = true;
     for (let numero = 1; numero <= 4; numero++) {
         const cantidad = cartas.filter(carta => carta.numero === numero).length;
@@ -501,11 +511,10 @@ function ejecutarPruebas() {
  * @returns {void}
  */
 function finDePartida() {
-    try {
-        localStorage.removeItem(CLAVE_CONFIGURACION);
-        localStorage.removeItem(CLAVE_PARTIDA);
-        console.log("Partida finalizada. Datos de la partida eliminados de localStorage.");
-    } catch (error) {
-        console.error("No se pudo eliminar la partida guardada:", error);
-    }
+    localStorage.removeItem(CLAVE_CONFIGURACION);
+    localStorage.removeItem(CLAVE_PARTIDA);
+
+    cartasPartida = [];
+
+    console.log("Partida finalizada y datos eliminados.");
 }
