@@ -1,5 +1,6 @@
 import { Carta } from "./carta.js";
 import { Contador } from "./contador.js";
+import { Temporizador } from "./temporizador.js";
 
 "use strict";
 const CLAVE_CONFIGURACION = "dew_juego_parejas_config";
@@ -14,6 +15,23 @@ contador.agregarObservador((total) => {
 
     if (elementoContador) {
         elementoContador.textContent = total;
+    }
+});
+
+const temporizador = new Temporizador();
+temporizador.agregarObservador((tiempo) => {
+    const minutos = Math.floor(tiempo / 60);
+    const segundos = tiempo % 60;
+
+    const elementoTiempo = document.getElementById("tiempo-partida");
+
+    if (elementoTiempo) {
+        elementoTiempo.textContent =
+            `${String(minutos).padStart(2, "0")}:${String(segundos).padStart(2, "0")}`;
+    }
+
+    if (cartasPartida.length > 0) {
+        guardarPartida(configuracion, cartasPartida);
     }
 });
 
@@ -188,8 +206,8 @@ function guardarPartida(configuracion, cartas) {
                 numero: carta.numero,
                 descubierta: carta.descubierta
             })),
-            contador: contador.contador
-
+            contador: contador.contador,
+            tiempo: temporizador.tiempo
         };
 
         const datosJSON = JSON.stringify(partida);
@@ -337,6 +355,7 @@ function darVueltaCarta(x, y) {
     const descubierta = cartasPartida[posicion].voltear();
     if (descubierta) {
         contador.incrementar();
+        temporizador.iniciar();
     }
 
     // Actualizar el tablero.
@@ -397,6 +416,7 @@ function prepararPartida() {
         cartasPartida = partidaGuardada.cartas.map(carta => new Carta(carta.numero, carta.descubierta));
        
         contador.restaurar(partidaGuardada.contador ?? 0);
+        temporizador.restaurar(partidaGuardada.tiempo ?? 0);
        
         console.log("Se ha recuperado la partida guardada.");
         mostrarResumen(configuracion, cartasPartida);
@@ -415,6 +435,7 @@ function prepararPartida() {
 
     configuracion = configuracionElegida;
     contador.restaurar(0);
+    temporizador.restaurar(0);
 
     guardarConfiguracion(configuracion);
 
@@ -441,6 +462,7 @@ prepararPartida();
 window.darVueltaCarta = darVueltaCarta;
 window.finDePartida = finDePartida;
 window.ejecutarPruebas = ejecutarPruebas;
+window.temporizador = temporizador;
 
 /**
  * Ejecuta pruebas para comprobar el funcionamiento del juego.
@@ -541,6 +563,10 @@ function ejecutarPruebas() {
 function finDePartida() {
     localStorage.removeItem(CLAVE_CONFIGURACION);
     localStorage.removeItem(CLAVE_PARTIDA);
+
+    temporizador.detener();
+    temporizador.restaurar(0);
+    contador.restaurar(0);
 
     cartasPartida = [];
 
