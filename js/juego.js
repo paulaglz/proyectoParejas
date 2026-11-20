@@ -420,6 +420,7 @@ function prepararPartida() {
 prepararPartida();
 window.darVueltaCarta = darVueltaCarta;
 window.finDePartida = finDePartida;
+window.ejecutarPruebas = ejecutarPruebas;
 
 /**
  * Ejecuta pruebas para comprobar el funcionamiento del juego.
@@ -468,6 +469,13 @@ function ejecutarPruebas() {
 
     // Pruebas de generación.
     const cartas = generarCartas({ parejas: 4 });
+    comprobar(cartas[0] instanceof Carta, "Las cartas son instancias de la clase Carta.");
+    const cartaPrueba = new Carta(1);
+    cartaPrueba.descubierta = "si";
+    comprobar(cartaPrueba.descubierta === false, "El setter rechaza valores que no sean booleanos.");
+
+    cartaPrueba.voltear();
+    comprobar(cartaPrueba.descubierta === true, "El método voltear descubre la carta.");
 
     comprobar(cartas.length === 8, "Genera dos cartas por cada pareja.");
     comprobar(cartas.every(carta => typeof carta.numero === "number"), 

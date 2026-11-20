@@ -37,11 +37,22 @@ export class Carta {
     }
 
     /**
+     * Comprueba si el estado recibido es un booleano.
+     *
+     * @param {boolean} estado Estado que se comprobará.
+     * @returns {boolean} true si es booleano y false si no lo es.
+     */
+    #validarEstado(estado) {
+        return typeof estado === "boolean";
+    }
+
+
+    /**
      * Modifica el estado de la carta.
      * @param {boolean} estado Nuevo estado de la carta.
      */
     set descubierta(estado) {
-        if (typeof estado === "boolean") {
+        if (this.#validarEstado(estado)) {
             this.#descubierta = estado;
         }
     }

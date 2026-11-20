@@ -1,5 +1,5 @@
 # DEW · UD3 · Juego de parejas
-
+Enlace a repositorio de git: https://github.com/paulaglz/proyectoParejas.git
 ## Estructura
 - `index.html`: página de ejemplo que carga el JavaScript.
 - `js/juego.js`: lógica del juego, configuración, validación, generación, barajado, persistencia y pruebas.
