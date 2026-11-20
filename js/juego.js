@@ -1,10 +1,21 @@
 import { Carta } from "./carta.js";
+import { Contador } from "./contador.js";
 
 "use strict";
 const CLAVE_CONFIGURACION = "dew_juego_parejas_config";
 const CLAVE_PARTIDA = "dew_juego_parejas_partida";
 let configuracion = recuperarConfiguracion();
 let cartasPartida = [];
+const contador = new Contador();
+contador.agregarObservador((total) => {
+    console.log("Número de volteos:", total);
+
+    const elementoContador = document.getElementById("contador-volteos");
+
+    if (elementoContador) {
+        elementoContador.textContent = total;
+    }
+});
 
 /* Función mostrarCartas */
 /**
@@ -176,7 +187,9 @@ function guardarPartida(configuracion, cartas) {
             cartas: cartas.map(carta => ({
                 numero: carta.numero,
                 descubierta: carta.descubierta
-            }))
+            })),
+            contador: contador.contador
+
         };
 
         const datosJSON = JSON.stringify(partida);
@@ -321,7 +334,10 @@ function darVueltaCarta(x, y) {
     }
 
     // Voltear la carta utilizando su método.
-    cartasPartida[posicion].voltear();
+    const descubierta = cartasPartida[posicion].voltear();
+    if (descubierta) {
+        contador.incrementar();
+    }
 
     // Actualizar el tablero.
     mostrarCartas(cartasPartida);
@@ -378,7 +394,10 @@ function prepararPartida() {
 
     if (partidaGuardada !== null) {
         configuracion = partidaGuardada.configuracion;
-        cartasPartida = partidaGuardada.cartas.map( carta => new Carta(carta.numero, carta.descubierta));
+        cartasPartida = partidaGuardada.cartas.map(carta => new Carta(carta.numero, carta.descubierta));
+       
+        contador.restaurar(partidaGuardada.contador ?? 0);
+       
         console.log("Se ha recuperado la partida guardada.");
         mostrarResumen(configuracion, cartasPartida);
         mostrarCartas(cartasPartida);
@@ -395,6 +414,7 @@ function prepararPartida() {
     }
 
     configuracion = configuracionElegida;
+    contador.restaurar(0);
 
     guardarConfiguracion(configuracion);
 
